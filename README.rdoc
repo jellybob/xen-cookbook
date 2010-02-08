@@ -1,0 +1,34 @@
+= Xen Tools support
+
+This cookbook is designed to allow provisioning VMs by adding new data bag items
+in the virtual_machines data bag. Currently it only supports bootstrapping using
+xen-tools, from a tarball or directory.
+
+Patches to use debootstrap and similar would be welcome.
+
+== Creating a new VM
+
+Add the Xen recipe to your Dom0, and set the default_vm attributes to taste.
+
+You'll also need to take an image of an existing VM. Mount it's disk at somewhere,
+and then run `tar cvzf my-vm-image.tgz .` and move the created file somewhere more
+permanent. Set xen/default_vm/install_source to that path.
+
+Now you can create a new data bag item in a virtual_machines databag:
+
+  { "id": "testvm" }
+
+That's the bare minimum. The VM will be called testvm.domain. It'll be created,
+and then started using xm create.
+
+Any options in xen/default_vm can be overridden from the data bag for a VM:
+
+  { "id": "bigtestvm", "size": "100G", "memory": "1G", "install_source": "/media/images/web-server.tgz" }
+
+== Using Chef to manage your new VMs
+
+By creating an image with Chef configured you can make things completely automated. Add a data bag item. Wait
+a little while. Start using Chef to manage your VM.
+
+You'll need to create a base VM image, with Chef installed. Copy your validation key over to /etc/chef/, and make
+sure the client is set to hit your Chef server. Now when it boots up for the first time, it'll register with Chef.
